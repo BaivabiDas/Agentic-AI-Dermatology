@@ -1,0 +1,41 @@
+version: '3.9'
+
+services:
+
+  prediction-agent:
+    build:
+      context: ./prediction_container
+    container_name: prediction-agent
+    ports:
+      - "5001:5000"
+    environment:
+      OLLAMA_HOST: "http://host.docker.internal:11434"
+    volumes:
+      - model_selection:/shared
+    depends_on:
+      selection-agent:
+        condition: service_completed_successfully
+
+  data-processing-agent:
+    build:
+      context: ./data_processing_container
+    container_name: data-processing-agent
+    ports:
+      - "5000:5000"
+
+  selection-agent:
+    build:
+      context: ./selection_container
+    container_name: selection-agent
+    volumes:
+      - model_selection:/shared
+
+  recommendation-agent:
+    build:
+      context: ./recommendation_container
+    container_name: recommendation-agent
+    environment:
+      OLLAMA_HOST: "http://host.docker.internal:11434"
+
+volumes:
+  model_selection:

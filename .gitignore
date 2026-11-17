@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.pyc
+venv/
+.env
+
+# Model weights
+*.pth
+*.pt
+*.h5
+
+# Dataset
+dataset/
+data/
+*.csv
+
+# IDE
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+
+# Virtual environments
+.venv/
+.venv_train/
+venv/
+
+# Dataset folders
+test/
+demo_dataset/
+
+# Ignore training images and other files
+# but preserve the dataset generation script
+!train/
+train/*
+!train/generate_dataset.py
+
+# Model weights
+*.pth
+*.pt
+*.ckpt
+*.onnx
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Secrets
+.env

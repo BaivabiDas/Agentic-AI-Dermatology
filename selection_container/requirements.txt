@@ -1,0 +1,10 @@
+numpy
+pandas
+pillow
+torch
+torchvision
+psutil
+scikit-learn
+scipy
+networkx
+joblib

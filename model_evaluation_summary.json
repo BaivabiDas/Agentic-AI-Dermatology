@@ -1,0 +1,7 @@
+{
+    "test_images": 1546,
+    "number_of_classes": 22,
+    "device": "cuda",
+    "CNN_accuracy": 6.4,
+    "Swin_accuracy": 12.23
+}

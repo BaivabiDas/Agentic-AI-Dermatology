@@ -1,0 +1,9 @@
+torch
+torchvision
+pillow
+numpy
+opencv-python
+timm
+pandas
+ollama
+flask

@@ -1,0 +1,12 @@
+venv/
+__pycache__/
+*.pyc
+*.pth
+train/
+demo_dataset/
+prediction_container/
+data_processing_container/
+selection_container/
+recommendation_container/
+.git/
+.vscode/

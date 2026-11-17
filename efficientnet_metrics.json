@@ -1,0 +1,10 @@
+{
+    "model": "EfficientNet-B0",
+    "number_of_classes": 22,
+    "training_images": 13898,
+    "testing_images": 1546,
+    "test_accuracy": 71.67,
+    "best_evaluation_accuracy": 71.67,
+    "epochs": 5,
+    "device": "cuda"
+}
