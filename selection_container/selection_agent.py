@@ -1,8 +1,10 @@
+
 import os
 import psutil
 import shutil
 import json
 import time
+
 start_time = time.perf_counter()
 
 # --------------------------------
@@ -10,9 +12,19 @@ start_time = time.perf_counter()
 # --------------------------------
 
 models = {
+    "cnn_agent.pth": {
+        "accuracy": 40.75,
+        "type": "CNN"
+    },
+
     "efficientnet_agent.pth": {
         "accuracy": 71.67,
         "type": "EfficientNet"
+    },
+
+    "swin_agent.pth": {
+        "accuracy": 78.78,
+        "type": "Swin Transformer"
     }
 }
 
@@ -54,13 +66,17 @@ for model_name, info in models.items():
             "score": score
         })
 
+    else:
+        print(f"\nModel file missing: {model_name}")
+
 # --------------------------------
 # NO MODELS FOUND
 # --------------------------------
 
 if not available_models:
-    print("\nNo trained models found!")
-    exit()
+    raise FileNotFoundError(
+        "No trained model files found in Selection Agent!"
+    )
 
 # --------------------------------
 # RESOURCE FILTERING
@@ -70,9 +86,9 @@ suitable_models = []
 
 for model in available_models:
 
-    if model["type"] == "Swin Transformer":
+    if model["type"] == "CNN":
 
-        if available_ram < 4 or cpu_usage > 80:
+        if available_ram < 2 or cpu_usage > 90:
             continue
 
     elif model["type"] == "EfficientNet":
@@ -80,12 +96,22 @@ for model in available_models:
         if available_ram < 2 or cpu_usage > 90:
             continue
 
+    elif model["type"] == "Swin Transformer":
+
+        if available_ram < 4 or cpu_usage > 80:
+            continue
+
     suitable_models.append(model)
 
-# Fallback if none satisfy constraints
+# --------------------------------
+# NO SUITABLE MODEL
+# --------------------------------
 
 if not suitable_models:
-    suitable_models = available_models
+    raise RuntimeError(
+        "No model satisfies the current resource requirements. "
+        "Selection stopped instead of choosing an unsuitable model."
+    )
 
 # --------------------------------
 # SELECT BEST MODEL
@@ -96,46 +122,56 @@ best_model = max(
     key=lambda x: x["score"]
 )
 
-with open("selected_model.txt", "w") as f:
-    f.write(best_model["name"])
-# Copy selected model information to shared volume
+# --------------------------------
+# SAVE SELECTED MODEL
+# --------------------------------
+
+os.makedirs("/shared", exist_ok=True)
+
 with open("/shared/selected_model.txt", "w") as f:
     f.write(best_model["name"])
 
-# Copy selected model weights to shared volume
-shutil.copy(
+shutil.copy2(
     best_model["name"],
     "/shared/selected_model.pth"
 )
 
+with open("selected_model.txt", "w") as f:
+    f.write(best_model["name"])
+
 print(
-    f"Selected model copied to shared volume: "
+    f"\nSelected model copied to shared volume: "
     f"{best_model['name']}"
 )
 
 # --------------------------------
-# DISPLAY DETAILS
+# DISPLAY AVAILABLE MODELS
 # --------------------------------
 
 print("\n===== AVAILABLE MODELS =====")
 
 for model in available_models:
 
+    print(f"\nModel    : {model['name']}")
+    print(f"Type     : {model['type']}")
+    print(f"Accuracy : {model['accuracy']}%")
+    print(f"Size     : {model['size']:.2f} MB")
+    print(f"Score    : {model['score']:.2f}")
     print(
-        f"\nModel: {model['name']}"
+        f"Resource eligible: "
+        f"{model in suitable_models}"
     )
-    print(f"Type      : {model['type']}")
-    print(f"Accuracy  : {model['accuracy']}%")
-    print(f"Size      : {model['size']:.2f} MB")
-    print(f"Score     : {model['score']:.2f}")
+
+# --------------------------------
+# DISPLAY SELECTED MODEL
+# --------------------------------
 
 print("\n===== SELECTED MODEL =====")
 print(f"Model Name : {best_model['name']}")
 print(f"Type       : {best_model['type']}")
 print(f"Accuracy   : {best_model['accuracy']}%")
 print(f"Size       : {best_model['size']:.2f} MB")
-
-selected_model = best_model["name"]
+print(f"Score      : {best_model['score']:.2f}")
 
 # --------------------------------
 # SAVE SELECTION METADATA
@@ -154,12 +190,8 @@ selection_info = {
     "selection_time_seconds": round(selection_time, 4)
 }
 
-os.makedirs("/shared", exist_ok=True)
-
 with open("/shared/selection_info.json", "w") as f:
     json.dump(selection_info, f, indent=4)
 
 print("\nSelection metadata saved to shared volume!")
-
-
 print("\nSelection Agent completed successfully!")

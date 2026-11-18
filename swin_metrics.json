@@ -1,0 +1,11 @@
+{
+    "model": "Swin-Tiny",
+    "number_of_classes": 22,
+    "training_images": 12509,
+    "validation_images": 1389,
+    "testing_images": 1546,
+    "test_accuracy": 78.78,
+    "best_validation_accuracy": 78.04,
+    "epochs_completed": 20,
+    "device": "cuda"
+}
